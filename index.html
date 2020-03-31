@@ -1,0 +1,94 @@
+<html>
+<head>
+<title>Rgue.in: live debates that matter</title>
+<style>
+html, body {
+ font-family: Verdana, Helvetica, sans-serif;
+ font-size: 14px;
+ line-height: 1.71em;
+ background-color: #505080;
+ height:100%;
+ margin:0;
+ padding:0;
+ overflow:hidden;
+}
+
+#splash {z-index:1; width:100%; height:100%; text-align:center; padding:1.5em; color:#FFFFFF;}
+#splash h1 {font-size: 3em;}
+#splash h2 {font-size: 2em; color: #FF9900;}
+#splash h3 {font-size: 1.5em; color: #AAAAAA;}
+.cg {color: #89BD41;}
+.cw {color: #FFFFFF;}
+</style>
+</head>
+
+<body>
+<div id="splash">
+<h1>Rgue.in</h1>
+<h3>live debates <em>that</em> matter</h3>
+<canvas id="clockCanvas" width="198" height="198">Canvas not available.</canvas>
+</div>
+<script type="text/javascript">
+function hsv2rgb(h, s, v) {
+  var d2h = function(x) {return ("0" + Math.round(x*255).toString(16)).slice(-2)};
+  var d=d2h(v);
+  var r=d,g=d,b=d;
+  if (s !== 0) {
+    h = h / 60;
+    i = Math.floor(h);
+    var a = [d2h(v*(1-s)), d2h(v*(1-s*(h-i))), d2h(v*(1-s*(1-(h-i))))];
+    switch(i) {
+      case 0: r=d;g=a[2];b=a[0]; break;
+      case 1: r=a[1];g=d;b=a[0]; break;
+      case 2: r=a[0];g=d;b=a[2]; break;
+      case 3: r=a[0];g=a[1];b=d; break;
+      case 4: r=a[2];g=a[0];b=d; break;
+      default: r=d;g=a[0];b=a[1]; break;
+    }
+  }
+  return '#'+r+g+b;
+};
+
+function hsvpercentagecolor(percentage) {
+  var val = Math.abs(percentage*100);
+  //hue=0 (red) 120 (green)
+  var hue = Math.floor((100 - val) * 120 / 100);
+  var d2h = function(x) {
+    return ("0" + Math.round(x*255).toString(16)).slice(-2)
+  };
+  return hsv2rgb(hue, 1, 1);
+}
+
+var canvas = document.getElementById('clockCanvas');
+var ctx = canvas.getContext('2d');
+var radius = 75;
+ctx.lineWidth = 23;
+ctx.lineCap = "round";
+ctx.font = 'bold 63px sans-serif';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.strokeStyle = '#89BD41';
+function clock(){
+  var drawcircle = function(x, y, number, percentage) {
+    ctx.translate(x, y);
+    ctx.rotate(-Math.PI/2);
+    ctx.strokeStyle = hsvpercentagecolor(percentage);
+    ctx.beginPath();
+    ctx.arc(0,0,radius,0,percentage*(Math.PI*2),false);
+    ctx.stroke();
+    ctx.rotate(-1.5*Math.PI);
+    ctx.fillStyle = ctx.strokeStyle;
+    if (number < 10) {number = '0' + number;}
+    ctx.fillText(number, 0, 0);
+  };
+  var now = new Date();
+  ctx.save();
+  ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+  drawcircle(98, 98, (60-now.getSeconds()), ((now.getMilliseconds()/1000)+now.getSeconds())/60);
+  ctx.restore();
+};
+
+setInterval(clock,100); //10 fps
+</script>
+</body>
+</html>
